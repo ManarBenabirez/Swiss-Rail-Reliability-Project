@@ -1,0 +1,6 @@
+pyspark==4.0.1
+pandas==2.2.3
+pyarrow==18.1.0
+matplotlib==3.9.4
+requests==2.32.3
+jupyterlab==4.3.4

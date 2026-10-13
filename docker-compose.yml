@@ -1,0 +1,26 @@
+services:
+  # Run scripts:  docker compose run --rm pipeline python scripts/download_data.py --days 2
+  # Full run:     docker compose run --rm pipeline
+  pipeline:
+    build: .
+    image: swiss-rail-reliability:latest
+    volumes:
+      - .:/app
+    environment:
+      SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-4g}   # use 2g on an 8 GB laptop
+    ports:
+      - "4040:4040"   # Spark UI while a job runs: http://localhost:4040
+    command: ["bash", "run_pipeline.sh"]
+
+  # Notebooks for exploring:  docker compose up jupyter  ->  http://localhost:8888
+  jupyter:
+    image: swiss-rail-reliability:latest
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-4g}
+    ports:
+      - "8888:8888"
+    command: ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser",
+              "--allow-root", "--ServerApp.token=", "--notebook-dir=/app"]

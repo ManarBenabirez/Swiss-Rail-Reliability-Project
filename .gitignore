@@ -1,0 +1,19 @@
+# Data is NEVER committed: it is far too big. scripts/download_data.py fetches it.
+data/
+data_sample/
+output/
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Python / Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
