@@ -1,7 +1,6 @@
 # Data is NEVER committed: it is far too big. scripts/download_data.py fetches it.
 data/
 data_sample/
-output/
 spark-warehouse/
 metastore_db/
 derby.log
