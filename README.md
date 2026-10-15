@@ -27,3 +27,60 @@ A train is **on time** if it arrives less than 3 minutes late (SBB definition).
   Source: opentransportdata.swiss.
 - **The data is not in this repository** (too big). The script `scripts/download_data.py` downloads it (see below).
 - The online catalogue only keeps the most recent days. A copy of our raw files is on Kaggle: **https://www.kaggle.com/datasets/meflahyousra/swiss-rail-ist-daten-v2-28-sep-to-11-oct-2026**
+
+
+## How to run
+
+### 1. Requirements
+
+- **Docker Desktop** (with Docker Compose). Nothing else: Python, Java and Spark are inside the Docker image.
+- About **20 GB of free disk space** (raw CSV + Parquet tables).
+- At least **8 GB of RAM**. Spark uses 4 GB by default. On an 8 GB laptop, create a file called `.env` next to `docker-compose.yml` with this line:
+  ```
+  SPARK_DRIVER_MEMORY=2g
+  ```
+
+### 2. Get the code
+
+```
+git clone https://github.com/ManarBenabirez/Swiss-Rail-Reliability-Project.git
+cd Swiss-Rail-Reliability-Project
+docker compose build
+```
+
+### 3. Download the data
+
+```
+docker compose run --rm pipeline python scripts/download_data.py
+```
+
+This downloads our fixed period (28 Sep – 12 Oct 2026) into `data/raw/`.
+Useful options:
+- `--list` : show which days are available online
+- `--days 1` : quick test with the most recent day only
+
+**If the days are no longer online**, download our copy from Kaggle (link above) and put the files here:
+```
+data/raw/istdaten/2026-09-28_IstDaten.csv   (one file per day)
+data/raw/service_points/service_points.csv
+```
+
+### 4. Run the pipeline
+
+```
+docker compose run --rm pipeline
+```
+
+This runs the 6 steps one after the other (`run_pipeline.sh`) and stops at the first error.
+You can also run one step alone, for example:
+```
+docker compose run --rm pipeline python src/02_clean.py
+```
+
+### 5. Look at the results
+
+- In **Jupyter**: `docker compose up jupyter`, open http://localhost:8888 and then `notebooks/explore_results.ipynb`.
+- In the **terminal**, show any table:
+  ```
+  docker compose run --rm pipeline python scripts/show_table.py stops_clean 10 "station_name = 'Bern'"
+  ```
