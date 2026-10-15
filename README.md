@@ -84,3 +84,29 @@ docker compose run --rm pipeline python src/02_clean.py
   ```
   docker compose run --rm pipeline python scripts/show_table.py stops_clean 10 "station_name = 'Bern'"
   ```
+
+## Pipeline steps
+
+| Step | Script | What it does | Output |
+|---|---|---|---|
+| 0 | `scripts/download_data.py` | downloads the raw CSV files | `data/raw/` |
+| 1 | `src/01_ingest.py` | reads the CSV with an explicit schema, converts the types, renames the columns | `data/parquet/stops_typed`, `stations_typed`, `output/ingestion_report.csv` |
+| 2 | `src/01b_check_ingestion.py` | checks that Parquet = raw CSV (rows per day, types, sample rows) | PASS / FAIL on screen |
+| 3 | `src/02a_profile.py` | measures the problems before cleaning (missing values, duplicates, outliers...) | `output/profile/*.csv` |
+| 4 | `src/02_clean.py` | keeps Swiss train stops, removes duplicates and wrong rows, joins with the stations, computes the delay | `data/parquet/stops_clean`, `stations_clean`, `output/cleaning_report.csv` |
+| 5 | `src/02b_check_stations_join.py` | checks the station list and the join (one row per station, canton coverage) | PASS / FAIL + `output/profile/join_*.csv` |
+| 6 | `src/03_analyze.py` | answers the question with Spark SQL | `output/figures/*.png`|
+
+## Results
+- `output/figures/`: the 5 charts used in the report.
+
+## Project structure
+
+```
+├── Dockerfile, docker-compose.yml, requirements.txt
+├── run_pipeline.sh          runs steps 1 to 6
+├── scripts/                 download, first look at the raw files, show a table
+├── src/                     the pipeline (one script per step)
+├── notebooks/               Jupyter notebook to explore the results
+└── docs/                    report
+```
