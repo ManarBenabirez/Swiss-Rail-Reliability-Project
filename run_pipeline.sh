@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # Runs the whole Part 1 pipeline. Stops at the first error.
-# Download the data first: python scripts/download_data.py
+# If there is no raw data yet, it is first downloaded from our Kaggle copy.
 set -euo pipefail
 cd "$(dirname "$0")/src"
+
+if ! ls ../data/raw/istdaten/*.csv >/dev/null 2>&1; then
+  echo "=== 0/6 No raw data yet: download it from Kaggle ==="
+  python ../scripts/download_kaggle.py
+fi
 
 echo "=== 1/6 Ingestion ===";                python 01_ingest.py
 echo "=== 2/6 Check the ingestion ===";      python 01b_check_ingestion.py

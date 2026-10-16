@@ -8,6 +8,8 @@ services:
       - .:/app
     environment:
       SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-4g}   # use 2g on an 8 GB laptop
+      KAGGLE_USERNAME: ${KAGGLE_USERNAME:-}             # only needed if Kaggle asks for an account
+      KAGGLE_KEY: ${KAGGLE_KEY:-}
     ports:
       - "4040:4040"   # Spark UI while a job runs: http://localhost:4040
     command: ["bash", "run_pipeline.sh"]
