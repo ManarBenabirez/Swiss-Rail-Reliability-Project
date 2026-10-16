@@ -48,18 +48,20 @@ cd Swiss-Rail-Reliability-Project
 docker compose build
 ```
 
-### 3. Download the data
+### 3. Get the data
 
+Nothing to do: if `data/raw/` is empty, the pipeline (step 4) first downloads **our copy of the data from Kaggle** and puts it in the right folders. It can also be done alone:
+```
+docker compose run --rm pipeline python scripts/download_kaggle.py
+```
+
+Other option, from the official catalogue (only while it still has these days):
 ```
 docker compose run --rm pipeline python scripts/download_data.py
 ```
+Useful options: `--list` (days available online), `--days 1` (quick test with the most recent day).
 
-This downloads our fixed period (28 Sep – 12 Oct 2026) into `data/raw/`.
-Useful options:
-- `--list` : show which days are available online
-- `--days 1` : quick test with the most recent day only
-
-**If the days are no longer online**, download our copy from Kaggle (link above) and put the files here:
+Both scripts put the files here:
 ```
 data/raw/istdaten/2026-09-28_IstDaten.csv   (one file per day)
 data/raw/service_points/service_points.csv
@@ -71,7 +73,7 @@ data/raw/service_points/service_points.csv
 docker compose run --rm pipeline
 ```
 
-This runs the 6 steps one after the other (`run_pipeline.sh`) and stops at the first error.
+This downloads the data from Kaggle if needed, then runs the 6 steps one after the other (`run_pipeline.sh`) and stops at the first error.
 You can also run one step alone, for example:
 ```
 docker compose run --rm pipeline python src/02_clean.py
@@ -79,7 +81,8 @@ docker compose run --rm pipeline python src/02_clean.py
 
 ### 5. Look at the results
 
-- In **Jupyter**: `docker compose up jupyter`, open http://localhost:8888 and then `notebooks/explore_results.ipynb`.
+- The result tables are in `output/results/` and the charts in `output/figures/`.
+- In **Jupyter** (after running the pipeline): `docker compose up jupyter`, open http://localhost:8888 and then `notebooks/explore_results.ipynb`.
 - In the **terminal**, show any table:
   ```
   docker compose run --rm pipeline python scripts/show_table.py stops_clean 10 "station_name = 'Bern'"
